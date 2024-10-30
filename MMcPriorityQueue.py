@@ -84,7 +84,7 @@ class MMCPriorityQueue(MMcQueue):
         return self.lamda_k[k-1]
 
     def get_lq_k(self, k: int) -> float:
-        return self.get_lamda_k * self.get_wq_k
+        return (self.get_lamda_k) * (self.get_wq_k)
 
 
     def get_ro_k(self, k: int) -> float:
