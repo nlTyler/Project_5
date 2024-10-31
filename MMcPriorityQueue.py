@@ -25,20 +25,20 @@ class MMCPriorityQueue(MMcQueue):
     @property
     def lamda_k(self):
         """
-        Getter for the number of servers (c).
+        Gets the tuple of arrival rates (lamda_k) for each priority class.
 
         Returns:
-        int: Number of servers.
+            tuple: Tuple containing individual lambda values for each priority class.
         """
         return self._lamda_k
 
     @lamda_k.setter
     def lamda_k(self, value: float):
         """
-        Setter for the number of servers (c).
+        Sets the tuple of arrival rates for each priority class and updates aggregate lamda.
 
         Args:
-        value (int): Number of servers.
+            value (tuple): Tuple containing individual lambda values for each priority class.
         """
 
         self.lamda = value
@@ -46,10 +46,22 @@ class MMCPriorityQueue(MMcQueue):
 
     @property
     def lamda(self):
+        """
+                Gets the aggregate arrival rate.
+
+                Returns:
+                    float: Aggregate arrival rate (sum of lamda_k values).
+                """
         return self._lamda
 
     @lamda.setter
     def lamda(self, value: float):
+        """
+                Sets the aggregate arrival rate, recalculating it based on lamda_k values.
+
+                Args:
+                    value (tuple): Tuple containing individual lambda values for each priority class.
+                """
 
         self._lamda = self.simplify_lamda()
 
@@ -61,6 +73,15 @@ class MMCPriorityQueue(MMcQueue):
         self._recalc_needed = True
 
     def get_b_k(self, k: int) -> float:
+        """
+                Calculates the blocking probability for priority class k.
+
+                Args:
+                    k (int): Priority class index (1-based).
+
+                Returns:
+                    float: Blocking probability for the specified priority class.
+                """
         if not isinstance(self.lamda, tuple):
             w_lamda = (self.lamda,)
         else:
@@ -75,23 +96,77 @@ class MMCPriorityQueue(MMcQueue):
             return 1
 
     def get_l_k(self, k: int) -> float:
+        """
+                Calculates the average number of customers in the system for priority class k.
+
+                Args:
+                    k (int): Priority class index (1-based).
+
+                Returns:
+                    float: Average number of customers in the system for the specified priority class.
+                """
         if k <= 0:
             return math.inf
         else:
             return self.get_lamda_k * self.get_w_k
 
     def get_lamda_k(self, k: int) -> float:
+        """
+                Retrieves the arrival rate (lambda) for priority class k.
+
+                Args:
+                    k (int): Priority class index (1-based).
+
+                Returns:
+                    float: Arrival rate for the specified priority class.
+                """
         return self.lamda_k[k-1]
 
     def get_lq_k(self, k: int) -> float:
+        """
+                Calculates the average number of customers in the queue for priority class k.
+
+                Args:
+                    k (int): Priority class index (1-based).
+
+                Returns:
+                    float: Average number of customers in the queue for the specified priority class.
+                """
         return (self.get_lamda_k) * (self.get_wq_k)
 
 
     def get_ro_k(self, k: int) -> float:
+        """
+                Calculates the traffic intensity (ro) for priority class k.
+
+                Args:
+                    k (int): Priority class index (1-based).
+
+                Returns:
+                    float: Traffic intensity for the specified priority class.
+                """
         return self.simplify_lamda() / (self.c * self.mu)
 
     def get_w_k(self, k: int) -> float:
+        """
+                Calculates the average time a customer spends in the system for priority class k.
+
+                Args:
+                    k (int): Priority class index (1-based).
+
+                Returns:
+                    float: Average time in the system for the specified priority class.
+                """
         return self.get_wq_k + (1 / self.mu)
 
     def get_wq_k (self, k: int) -> float:
+        """
+                Calculates the average waiting time in the queue for priority class k.
+
+                Args:
+                    k (int): Priority class index (1-based).
+
+                Returns:
+                    float: Average waiting time in the queue for the specified priority class.
+                """
         return (1-self.ro) * self.wq / (self.get_b_k(k-1) * self.get_b_k(k))

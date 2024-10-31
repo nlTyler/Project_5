@@ -68,6 +68,12 @@ class MG1Queue(BaseQueue):
             self._p0 = 1 - (self.lamda / self.mu)
 
     def is_valid(self) -> bool:
+        """
+        Check if the system is feasible (sigma > 0).
+
+        Returns:
+        bool: True if the system is valid, False otherwise.
+        """
         return self.sigma > 0
 
     def __repr__(self) -> str:
