@@ -65,7 +65,7 @@ class MMCPriorityQueue(MMcQueue):
 
         self._lamda = self.simplify_lamda()
 
-        if math.isnan(self.lamda):
+        if math.isnan(self._lamda):
             self._lamda_k = (math.nan,)
         else:
             self._lamda_k = value
@@ -157,7 +157,7 @@ class MMCPriorityQueue(MMcQueue):
                 Returns:
                     float: Average time in the system for the specified priority class.
                 """
-        return self.get_wq_k + (1 / self.mu)
+        return (1 / self.mu) + self.get_wq_k
 
     def get_wq_k (self, k: int) -> float:
         """
