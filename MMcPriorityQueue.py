@@ -4,7 +4,7 @@ import math
 from MMcQueue import MMcQueue
 
 
-class MMCPriorityQueue(MMcQueue):
+class MMcPriorityQueue(MMcQueue):
     """
         Represents a multi-server queueing system (M/M/c) inheriting from BaseQueue.
 

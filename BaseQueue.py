@@ -11,7 +11,7 @@ class BaseQueue:
             mu (float): Service rate.
             p0 (float): Probability that there are zero customers in the system.
             lq (float): Average number of customers in the queue.
-            recalc_needed (bool): Flag indicating whether metrics recalculation is needed.
+            _recalc_needed (bool): Flag indicating whether metrics recalculation is needed.
             l (float): Average number of customers in the system.
             r (float): Traffic intensity (arrival rate / service rate).
             ro (float): Traffic intensity (same as _r).
@@ -143,7 +143,7 @@ class BaseQueue:
         float: The average number of customers in the queue.
         """
         if self._recalc_needed:
-            self.calc_metrics()
+            self._calc_metrics()
         return self._lq
 
     @property
@@ -155,7 +155,7 @@ class BaseQueue:
         float: the probability that there are 0 customers in the queue.
         """
         if self._recalc_needed:
-            self.calc_metrics()
+            self._calc_metrics()
         return self._p0
 
     def _get_recalc_needed(self):
@@ -225,7 +225,7 @@ class BaseQueue:
         """
         return self.r
 
-    def calc_metrics(self):
+    def _calc_metrics(self):
         """
         Calculate queueing system metrics including Lq, L, Wq, W, R, and utilization.
         """

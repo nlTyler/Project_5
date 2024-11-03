@@ -1,3 +1,5 @@
+from numpy import number
+
 from BaseQueue import BaseQueue
 import math
 
@@ -19,7 +21,7 @@ class MG1Queue(BaseQueue):
             r (float): Average number of customers in the system including those in service.
             utilization (float): Utilization of the system in percentage.
         """
-    def __init__(self, lamda: float, mu: float, sigma: float):
+    def __init__(self, lamda: float, mu: float, sigma: float = 0.0):
         """
         Initializes the M/M/c queue with arrival rate (lamda), service rate (mu), and number of servers (c).
         Calculates queueing metrics using calc_metrics method.
@@ -30,7 +32,7 @@ class MG1Queue(BaseQueue):
         c (int): Number of servers.
         """
         super().__init__(lamda, mu)
-        self.sigma = sigma  # Number of servers
+        self.sigma = sigma
 
     @property
     def sigma(self) -> float:
@@ -50,8 +52,12 @@ class MG1Queue(BaseQueue):
         Args:
         value (int): Number of servers.
         """
+        if isinstance(value, float) and value > 0:
+            self._sigma = value
+        else:
+            self._sigma = math.nan
+        self._recalc_needed = True
 
-        self._sigma = value
 
     def calc_metrics(self):
         """
@@ -74,7 +80,10 @@ class MG1Queue(BaseQueue):
         Returns:
         bool: True if the system is valid, False otherwise.
         """
-        return self.sigma > 0
+        if isinstance(self.sigma, number):
+            if self.sigma > 0:
+                return True
+        return False
 
     def __repr__(self) -> str:
         """

@@ -198,8 +198,38 @@ class TestBaseQueue(TestCase):
         self.x._recalc_needed = False
         self.assertAlmostEqual(0.20, self.x.w)
 
+    def test_required_attributes(self):
+        # force recalc cycle so that attributes created by _calc_metrics will exist
+        self.x._calc_metrics()
+
+        # verify that required internal variables exist
+        for v in ['_lamda', '_mu', '_lq', '_p0', '_recalc_needed']:
+            with self.subTest(case=f'Required member: {v}'):
+                self.assertTrue(v in dir(self.x))
+
+        # verify that attributes for child classes do not exist
+        for v in ['_c', '_sigma', '_lamda_k']:
+            with self.subTest(case=f'Child class member: {v}'):
+                self.assertFalse(v in dir(self.x))
+
+    def test_derived_attributes(self):
+        # force recalc cycle so that attributes created by _calc_metrics will exist
+        self.x._calc_metrics()
+
+        # verify that derived variables do not exist as saved variables
+        for v in ['_l', '_wq', '_w', '_r', '_ro', '_rho', '_utilization']:
+            with self.subTest(case=f'Required member: {v}'):
+                self.assertFalse(v in dir(self.x))
+
+    def test_required_properties(self):
+        # force recalc cycle so that attributes created by _calc_metrics will exist
+        self.x._calc_metrics()
+
+        # verify that required properties exist
+        for v in ['lamda', 'mu', 'lq', 'l', 'wq', 'w', 'r', 'ro', 'utilization']:
+            with self.subTest(case=f'Required property: {v}'):
+                self.assertTrue(isinstance(getattr(q.BaseQueue, v, None), property))
+
 
 if __name__ == '__main__':
     main(verbosity=2)
-
-

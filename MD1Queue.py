@@ -29,7 +29,7 @@ class MD1Queue(BaseQueue):
         """
         super().__init__(lamda, mu)
 
-    def calc_metrics(self):
+    def _calc_metrics(self):
         """
                 Calculates queueing metrics: Lq, p0
         """

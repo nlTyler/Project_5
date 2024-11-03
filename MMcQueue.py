@@ -67,7 +67,7 @@ class MMcQueue(BaseQueue):
         """
         return self.r /self.c
 
-    def calc_metrics(self):
+    def _calc_metrics(self):
         """
         Calculates queueing metrics: Lq, L, Wq, W, p0, ro, r, and utilization.
         """
