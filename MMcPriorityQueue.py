@@ -67,7 +67,7 @@ class MMcPriorityQueue(MMcQueue):
                     value (tuple): Tuple containing individual lambda values for each priority class.
                 """
 
-        self._lamda = self.lamda
+        self._lamda = self.simplify_lamda()
 
         if math.isnan(self._lamda):
             self._lamda_k = (math.nan,)
