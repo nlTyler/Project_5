@@ -24,7 +24,7 @@ class MMcPriorityQueue(MMcQueue):
 
     def __init__(self, lamda: float, mu: float, c: int):
         super().__init__(lamda, mu, c)
-        self._lamda_k = lamda
+        self._lamda_k = (lamda,)
 
     @property
     def lamda_k(self):
@@ -37,7 +37,7 @@ class MMcPriorityQueue(MMcQueue):
         return self._lamda_k
 
     @lamda_k.setter
-    def lamda_k(self, value: float):
+    def lamda_k(self, values: tuple):
         """
         Sets the tuple of arrival rates for each priority class and updates aggregate lamda.
 
@@ -45,7 +45,11 @@ class MMcPriorityQueue(MMcQueue):
             value (tuple): Tuple containing individual lambda values for each priority class.
         """
 
-        self.lamda = value
+        if all(isinstance(val, (int, float)) for val in values):
+            self._lamda_k = values
+            self.lamda = self.simplify_lamda()
+        else:
+            self._lamda_k = (math.nan,)
 
 
     @property
@@ -67,7 +71,10 @@ class MMcPriorityQueue(MMcQueue):
                     value (tuple): Tuple containing individual lambda values for each priority class.
                 """
 
-        self._lamda = self.simplify_lamda()
+        if isinstance(value, (int, float)) and value > 0:
+            self._lamda = self.simplify_lamda()
+        else:
+            self._lamda = math.nan
 
         if math.isnan(self._lamda):
             self._lamda_k = (math.nan,)
@@ -75,6 +82,15 @@ class MMcPriorityQueue(MMcQueue):
             self._lamda_k = value
 
         self._recalc_needed = True
+
+    def simplify_lamda(self):
+        """
+        Calculates the aggregate arrival rate (lamda) as the sum of individual lamda_k values.
+
+        Returns:
+            float: Sum of lamda_k values or math.nan if lamda_k contains invalid data.
+        """
+        return sum(self._lamda_k) if all(isinstance(val, (int, float)) for val in self._lamda_k) else math.nan
 
     def get_b_k(self, k: int) -> float:
         """
@@ -109,10 +125,11 @@ class MMcPriorityQueue(MMcQueue):
                 Returns:
                     float: Average number of customers in the system for the specified priority class.
                 """
-        if k <= 0:
-            return math.inf
-        else:
-            return self.get_lamda_k * self.get_w_k
+        # if k <= 0:
+        #     return math.inf
+        # else:
+        #     return self.get_lamda_k * self.get_w_k
+        return self.get_lamda_k(k) * self.get_w_k(k)
 
     def get_lamda_k(self, k: int) -> float:
         """
@@ -124,7 +141,11 @@ class MMcPriorityQueue(MMcQueue):
                 Returns:
                     float: Arrival rate for the specified priority class.
                 """
-        return self.lamda_k[k-1]
+        #return self.lamda_k[k-1]
+        if 1 <= k <= len(self.lamda_k):
+            return self.lamda_k[k - 1]
+        else:
+            return math.nan
 
     def get_lq_k(self, k: int) -> float:
         """
@@ -136,7 +157,7 @@ class MMcPriorityQueue(MMcQueue):
                 Returns:
                     float: Average number of customers in the queue for the specified priority class.
                 """
-        return (self.get_lamda_k) * (self.get_wq_k)
+        return self.get_lamda_k(k) * self.get_wq_k(k)
 
 
     def get_ro_k(self, k: int) -> float:
@@ -149,7 +170,7 @@ class MMcPriorityQueue(MMcQueue):
                 Returns:
                     float: Traffic intensity for the specified priority class.
                 """
-        return self.simplify_lamda() / (self.c * self.mu)
+        return self.get_lamda_k(k) / (self.c * self.mu)
 
     def get_w_k(self, k: int) -> float:
         """
@@ -161,7 +182,7 @@ class MMcPriorityQueue(MMcQueue):
                 Returns:
                     float: Average time in the system for the specified priority class.
                 """
-        return (1 / self.mu) + self.get_wq_k
+        return (1 / self.mu) + self.get_wq_k(k)
 
     def get_wq_k (self, k: int) -> float:
         """

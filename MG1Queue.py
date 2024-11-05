@@ -1,4 +1,5 @@
 import numbers
+from numbers import Number
 
 from numpy import number
 
@@ -35,6 +36,8 @@ class MG1Queue(BaseQueue):
         """
         super().__init__(lamda, mu)
         self.sigma = sigma
+        #self._recalc_needed = True
+
 
     @property
     def sigma(self) -> float:
@@ -54,14 +57,13 @@ class MG1Queue(BaseQueue):
         Args:
         value (int): Number of servers.
         """
-        if isinstance(value, float) and value >= 0:
+        if isinstance(value, Number) and value >= 0:
             self._sigma = value
         else:
             self._sigma = math.nan
         self._recalc_needed = True
 
-
-    def calc_metrics(self):
+    def _calc_metrics(self):
         """
                 Calculates queueing metrics: Lq, p0
         """
@@ -72,8 +74,8 @@ class MG1Queue(BaseQueue):
             self._lq = math.inf
             self._p0 = math.inf
         else:
-            self._lq = ((self.lamda ** 2 * self.sigma) + self.r ** 2) / (2 * (1 - self.r))
-            self._p0 = 1 - (self.lamda / self.mu)
+            self._lq = ((self.lamda ** 2 * self.sigma ** 2) + self.r ** 2) / (2 * (1 - self.r))
+            self._p0 = 1 - self.r
 
     def is_valid(self) -> bool:
         """
@@ -82,9 +84,18 @@ class MG1Queue(BaseQueue):
         Returns:
         bool: True if the system is valid, False otherwise.
         """
-        if isinstance(self._sigma, float) and self._sigma >= 0:
-            return True
-        return False
+        if not isinstance(self.sigma, Number):
+            return False
+        if math.isnan(self._sigma):
+            return False
+        if self.sigma < 0:
+            return False
+        return super().is_valid()
+
+    def is_feasible(self) -> bool:
+        if self._lamda == self._mu:
+            return False
+        return super().is_valid()
 
 
     def __repr__(self) -> str:
