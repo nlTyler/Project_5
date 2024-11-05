@@ -1,3 +1,5 @@
+import numbers
+
 from numpy import number
 
 from BaseQueue import BaseQueue
@@ -52,7 +54,7 @@ class MG1Queue(BaseQueue):
         Args:
         value (int): Number of servers.
         """
-        if isinstance(value, float) and value > 0:
+        if isinstance(value, float) and value >= 0:
             self._sigma = value
         else:
             self._sigma = math.nan
@@ -80,10 +82,10 @@ class MG1Queue(BaseQueue):
         Returns:
         bool: True if the system is valid, False otherwise.
         """
-        if isinstance(self.sigma, number):
-            if self.sigma > 0:
-                return True
+        if isinstance(self._sigma, float) and self._sigma >= 0:
+            return True
         return False
+
 
     def __repr__(self) -> str:
         """

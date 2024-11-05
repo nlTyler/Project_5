@@ -22,6 +22,10 @@ class MMcPriorityQueue(MMcQueue):
             utilization (float): Utilization of the system in percentage.
         """
 
+    def __init__(self, lamda: float, mu: float, c: int):
+        super().__init__(lamda, mu, c)
+        self._lamda_k = lamda
+
     @property
     def lamda_k(self):
         """
@@ -63,7 +67,7 @@ class MMcPriorityQueue(MMcQueue):
                     value (tuple): Tuple containing individual lambda values for each priority class.
                 """
 
-        self._lamda = self.simplify_lamda()
+        self._lamda = self.lamda
 
         if math.isnan(self._lamda):
             self._lamda_k = (math.nan,)
